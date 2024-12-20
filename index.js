@@ -1,27 +1,36 @@
 // Load in our Express framework
-const express       = require(`express`)
+const express = require(`express`);
 
 // Create a new Express instance called "app"
-const app           = express()
+const app = express();
+const twig = require("twig");
+const path = require("path");
 
 // Load in our RESTful routers
-const routers = require('./routers/index.js')
+const routers = require("./routers/index.js");
 
-const bodyParser = require('body-parser')
+const bodyParser = require("body-parser");
+app.use(express.static("public"));
 
-app.use(bodyParser.urlencoded({extended:false}))
+app.use(bodyParser.urlencoded({ extended: false }));
+
+const fileUpload = require("express-fileupload");
+app.use(fileUpload());
+
+app.set("views", __dirname + "/views");
+app.set("view engine", "twig");
+
+app.use(express.static(path.join(__dirname, "public")));
 
 // Home page welcome middleware
-app.get('/', (req, res) => {
-  res
-    .status(200)
-    .send('Welcome to Star Tracker Library')
-})
+app.get("/", (req, res) => {
+	res.status(200).render("home", { name: "Star Tracker" });
+});
 
 // Register our RESTful routers with our "app"
-app.use(`/planets`,  routers.planet)
-app.use(`/stars`,    routers.star)
-app.use(`/galaxies`, routers.galaxy)
-
+app.use(`/planets`, routers.planet);
+app.use(`/stars`, routers.star);
+app.use(`/galaxies`, routers.galaxy);
+app.use(`/images`, routers.image);
 // Set our app to listen on port 3000
-app.listen(3000)
+app.listen(3000);
